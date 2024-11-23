@@ -8,6 +8,21 @@ function Login() {
   const [mobileNumber, setMobileNumber] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState('');
+  const handleFacebookLogin = () => {
+    FB.login(
+      (response) => {
+        if (response.authResponse) {
+          // User logged in successfully
+          console.log('Logged in:', response);
+          // Redirect or proceed with authenticated user
+          window.location.href = '/';
+        } else {
+          console.log('User cancelled login or did not fully authorize.');
+        }
+      },
+      { scope: 'public_profile,email' }
+    );
+  };
 
   const handleSendOtp = async () => {
     // Call backend API to send OTP
@@ -73,6 +88,7 @@ function Login() {
           <button onClick={handleVerifyOtp}>Verify OTP</button>
         </div>
       )}
+      <button onClick={handleFacebookLogin}>Login with Facebook</button>
     </div>
   );
 }
