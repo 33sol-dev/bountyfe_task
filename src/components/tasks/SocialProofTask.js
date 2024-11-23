@@ -1,46 +1,66 @@
-// src/components/tasks/SocialProofTask.js
 /* global FB */
-import React from "react";
+import React, { useEffect } from 'react';
 
-function SocialProofTask({ onComplete }) {
-  const handleShare = () => {
-    if (typeof FB !== "undefined") {
-      // Check if user is logged in to Facebook
-      FB.getLoginStatus(function (response) {
-        if (response.status === "connected") {
-          // User is logged in, show the share dialog
-          showShareDialog();
-        } else {
-          // Prompt the user to log in to Facebook
-          FB.login(function (loginResponse) {
-            if (loginResponse.authResponse) {
-              // Logged in, now show the share dialog
-              showShareDialog();
-            } else {
-              console.log("User cancelled login or did not fully authorize.");
-            }
-          });
-        }
+const FacebookShare = () => {
+  useEffect(() => {
+    // Load Facebook SDK when the component mounts
+    (function (d, s, id) {
+      if (d.getElementById(id)) return;
+      const js = d.createElement(s);
+      js.id = id;
+      js.src = 'https://connect.facebook.net/en_US/sdk.js';
+      const fjs = d.getElementsByTagName(s)[0];
+      fjs.parentNode.insertBefore(js, fjs);
+    })(document, 'script', 'facebook-jssdk');
+
+    // Initialize the Facebook SDK
+    window.fbAsyncInit = function () {
+      FB.init({
+        appId: '1054553945988538', // Replace with your Facebook App ID
+        xfbml: true,
+        version: 'v21.0', // Replace with your API version, e.g., v17.0
       });
-    } else {
-      alert("Facebook SDK not loaded.");
+    };
+  }, []);
+
+  const handleLoginAndShare = () => {
+    if (typeof FB === 'undefined') {
+      alert('Facebook SDK not loaded.');
+      return;
     }
+
+    // Check the user's login status
+    FB.getLoginStatus(function (response) {
+      if (response.status === 'connected') {
+        // User is logged in, proceed to share
+        shareOnFacebook();
+      } else {
+        // User is not logged in, initiate login
+        FB.login(function (loginResponse) {
+          if (loginResponse.authResponse) {
+            // Login successful, proceed to share
+            shareOnFacebook();
+          } else {
+            alert('Login cancelled or not authorized.');
+          }
+        }, { scope: 'email' }); // Request necessary permissions
+      }
+    });
   };
 
-  const showShareDialog = () => {
+  const shareOnFacebook = () => {
     FB.ui(
       {
-        method: "share",
-        href: "https://www.indiahenna.com/",
-        quote: "I loved this product for my hair, and you can try it too!",
-        hashtag: "#HeenaProduct",
+        method: 'share',
+        href: 'https://www.indiahenna.com/', // URL to share
+        quote: 'I loved this product for my hair, and you can try it too!',
+        hashtag: '#HeenaProduct',
       },
       function (response) {
         if (response && !response.error_message) {
-          console.log("Posting completed.");
-          onComplete();
+          alert('Post was successfully shared!');
         } else {
-          console.log("Error while posting.");
+          alert('Error while sharing.');
         }
       }
     );
@@ -49,9 +69,9 @@ function SocialProofTask({ onComplete }) {
   return (
     <div>
       <p>Please share our campaign on Facebook to earn your cashback.</p>
-      <button onClick={handleShare}>Share on Facebook</button>
+      <button onClick={handleLoginAndShare}>Share on Facebook</button>
     </div>
   );
-}
+};
 
-export default SocialProofTask;
+export default FacebookShare;
