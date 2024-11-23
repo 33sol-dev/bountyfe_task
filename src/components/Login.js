@@ -1,5 +1,6 @@
 // src/components/Login.js
 
+/* global FB */
 import React, { useState } from 'react';
 import { requestNotificationPermission } from '../requestNotificationPermission';
 
@@ -8,6 +9,7 @@ function Login() {
   const [mobileNumber, setMobileNumber] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState('');
+  
   const handleFacebookLogin = () => {
     FB.login(
       (response) => {
